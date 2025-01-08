@@ -1,17 +1,17 @@
-# Incrementally Deployable Extensible Delegation for DNS
+# Incrementally Deployable DNSSEC Delegation
 
-This is the working area for the individual Internet-Draft, "Incrementally Deployable Extensible Delegation for DNS".
+This is the working area for the individual Internet-Draft, "Incrementally Deployable DNSSEC Delegation".
 
-* [Editor's Copy](https://NLnetLabs.github.io/incremental-deleg/#go.draft-homburg-deleg-incremental-deleg.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-homburg-deleg-incremental-deleg)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-homburg-deleg-incremental-deleg)
-* [Compare Editor's Copy to Individual Draft](https://NLnetLabs.github.io/incremental-deleg/#go.draft-homburg-deleg-incremental-deleg.diff)
+* [Editor's Copy](https://NLnetLabs.github.io/incremental-dnssec/#go.draft-homburg-deleg-incremental-dnssec.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-homburg-deleg-incremental-dnssec)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-homburg-deleg-incremental-dnssec)
+* [Compare Editor's Copy to Individual Draft](https://NLnetLabs.github.io/incremental-dnssec/#go.draft-homburg-deleg-incremental-dnssec.diff)
 
 
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/NLnetLabs/incremental-deleg/blob/main/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/NLnetLabs/incremental-dnssec/blob/main/CONTRIBUTING.md).
 
 Contributions can be made by creating pull requests.
 The GitHub interface supports creating pull requests using the Edit (✏) button.
