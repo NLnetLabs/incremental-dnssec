@@ -22,6 +22,7 @@
 title: "Incrementally Deployable DNSSEC Delegation"
 abbrev: "incremental-dnssec"
 category: std
+updates: 4034, 4035
 
 docname: draft-homburg-deleg-incremental-dnssec-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
@@ -108,6 +109,10 @@ The introduction of the dnskeyref parameter make it possible to manage DNSSEC wi
 
 One extra feature that becomes possible the use of SVCB-style records is to let the zone manage downgrade attacks.
 By introducing ds of dnskeyref parameters at different priority level, the zone can signal which algorithm is preferred.
+
+This document updates Section 2.1.1 of {{?RFC4034}} in the following way: the sentence "If bit 7 has value 0, then the DNSKEY record holds some other type of DNS public key and MUST NOT be used to verify RRSIGs that cover RRsets." is replaced by "If bit 7 has value 0, then the DNSKEY record holds some other type of DNS public key and can be used to verify RRSIGs that cover RRsets if required."
+
+This document updates Section 5.3.1 of {{?RFC4035}} and replaces the sentence "The RRSIG RR's Signer's Name field MUST be the name of the zone that contains the RRset." with "The RRSIG RR's Signer's Name field MUST be the name of any DNSKEY RRset that is allowed to sign the zone."
 
 {:removeinrfc}
 ## Incremental Deleg
@@ -210,6 +215,8 @@ After selecting priority level, the validator uses any ds parameters to validate
 The DNSKEY RRsets that dnskeyref paramters refer need to be DNSSEC Secure to be used.
 Any DNSKEY RRsets that are not DNSSEC Secure according to the validator MUST be ignored.
 
+\[Note, to be removed for publication. Should the validator check if the Zone Key flag is zero if the DNSKEY RRset is not at the apex. For now assume that it is just like the SEP flag and can be ignored.]
+
 To limit validator resources, when validating a name that refers to a DNSKEY RRset, the validator should only use ds parameters (and DS records) and ignore any dnskeyref parameters.
 
 Now that there are multiple DNSKEY RRsets that may be used to sign an RRset, the validator uses the Signer's Name in a signature to select a DNSKEY RRset to validate the signature. If the name does not match any of the DNSKEY RRset selected in the previous step then the signature MUST be ignored.
@@ -224,6 +231,7 @@ The signer can put a ds parameter with a more secure algorithm in a DELEG record
 The dnskeyref parameter requires that the validator puts the name of the DNSKEY RRset in the Signer's Name field of the signature.
 This is a small but significant change to how signers operate.
 The DNSKEY RRset MUST be DNSSEC Secure and the validation chain MUST only involve ds parameters or DS records.
+In addition DNSKEY records that are not at the apex of a zone MUST have the Zone Key flag set to 0 (bit 7 of the flags field, see {{?RFC4034}}, Section 2.1.1)
 The dnskeyref parameter also supports downgrade protection but has a number of additinal features that can be used by signers.
 
 The first is that because dnskeyref directly refers to a DNSKEY RRset there is no longer any need for Key Signing Keys (KSK).
@@ -254,7 +262,7 @@ customer1._deleg   IN  DELEG 1 ( ns.customer1
 {: title="One ds parameter that is part of a delegation"}
 
 ## One separate DELEG record with a ds parameter
- 
+
 ~~~~
 $ORIGIN example.
 @                  IN  SOA   ns zonemaster ...
@@ -267,7 +275,7 @@ customer2._deleg   IN  DELEG 0 ns.operator1
 {: title="One separate DELEG record with a ds parameter"}
 
 ## One separate DELEG record with a dnskeyref parameter
- 
+
 ~~~~
 $ORIGIN example.
 @                  IN  SOA   ns zonemaster ...
@@ -279,7 +287,7 @@ customer3._deleg   IN  DELEG 0 ns.operator1
 {: title="One separate DELEG record with a dnskeyref parameter"}
 
 ## Two operators with dnskeyref parameters
- 
+
 ~~~~
 $ORIGIN example.
 @                  IN  SOA   ns zonemaster ...
@@ -306,6 +314,22 @@ This DNS lookup is protected by a traditional DNSSEC chain, but the presence of 
 
 This trade-off between struct security and flexibility is left to the zone operator.
 
+A new risk that needs to be consider is old and forgotten dnskeyref parameters.
+Old DS records or ds parameters are mostly safe.
+An attacker can only asume then if the attacker can obtain the private key that can sign for the public key that the DS record or ds parameter refers to.
+This is not impossible but very unlikely.
+And the use of hardware security modules (HSM) can make this almost impossible.
+
+In contrast if a dnskeyref refers to a name in a forgotten domain in the registration of the domain is left to elapse then an attacker may register the name and set up a DNSKEY RRset at the name listed in the dnskeyref parameter.
+The risk of this can be reduced by two operational practices.
+The first is to put the dnskeyref parameter in the same (AliasMode) DELEG record that provides the name server delegation.
+This will make it likely that dnskeyref parameter will be removed once the
+name servers no long serve the zone.
+
+The second practice is that domain that allow registrations (mostly top level domains (TLD) but also other) could install a policy that a dnskeyref parameter has to refer to a DNSSEC Secure DNSKEY RRset set.
+Additionally each DNSKEY RRset that is referred to by a dnskeyref parameter has to be used to sign the zone as served by at least on of the name servers that serve the zone.
+This makes it possible to detect forgotten or misconfigured dnskeyref paramters early on.
+
 # IANA Considerations
 
 Per {{?RFC9460}}, IANA is requested to add the following entry to the DNS "Service Parameter Keys (SvcParamKeys)" registry:
@@ -324,4 +348,10 @@ Per {{?RFC9460}}, IANA is requested to add the following entry to the DNS "Servi
 
 # Acknowledgments
 {:numbered="false"}
+
+Jens Finkhäuser,
+Havard Eidnes,
+Edward Lewis,
+Petr Špaček,
+Johan Stenstam
 
