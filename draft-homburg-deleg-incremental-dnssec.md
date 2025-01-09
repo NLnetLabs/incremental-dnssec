@@ -218,6 +218,8 @@ Any DNSKEY RRsets that are not DNSSEC Secure according to the validator MUST be 
 \[Note, to be removed for publication. Should the validator check if the Zone Key flag is zero if the DNSKEY RRset is not at the apex. For now assume that it is just like the SEP flag and can be ignored.]
 
 To limit validator resources, when validating a name that refers to a DNSKEY RRset, the validator should only use ds parameters (and DS records) and ignore any dnskeyref parameters.
+Validator SHOULD allow for a DNAME and CNAME chain of reasonable length when
+resolving a name to a DNSKEY RRset.
 
 Now that there are multiple DNSKEY RRsets that may be used to sign an RRset, the validator uses the Signer's Name in a signature to select a DNSKEY RRset to validate the signature. If the name does not match any of the DNSKEY RRset selected in the previous step then the signature MUST be ignored.
 
