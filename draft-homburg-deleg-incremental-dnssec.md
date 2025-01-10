@@ -74,7 +74,7 @@ This document describes a DNSSEC delegation mechanism that complements {{?I-D.ho
 In particular, this mechanism makes it possible to store the contents of DS records as 'ds' parameters in SVCB-style records.
 This way, a single mechanism can specify both name servers and DNSSEC delegations.
 
-In addtion to a replacement for DS records, this document also introduces a 'dnskeyref' parameter that provides more flexibility and reduces the need to coordinate both for key rollovers and for multi-signer setups.
+In addition to a replacement for DS records, this document also introduces a 'dnskeyref' parameter that provides more flexibility and reduces the need to coordinate both for key rollovers and for multi-signer setups.
 
 There are two main problems with the current DS record.
 The first is a DS record refers to a key in a DNSKEY RRset.
