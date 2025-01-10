@@ -80,8 +80,7 @@ There are two main problems with the current DS record.
 The first is a DS record refers to a key in a DNSKEY RRset.
 Updating this keys (during a key rollover) requires updating the corresponding DS record.
 At the moment there is no widespread mechanism to update DS records automatically.
-However, even if such an update mechanism would become widespread, the signer
-also has to track to propagation of the new DS record to the secondaries of the parent zone.
+However, even if such an update mechanism would become widespread, the signer also has to track to propagation of the new DS record to the secondaries of the parent zone.
 This is needed to make sure that all old DS records are expired in caches before moving to the next stage of a key roll.
 
 The second problem is that DS records enforce the use of a single DNSKEY RRset (at the apex of the zone).
