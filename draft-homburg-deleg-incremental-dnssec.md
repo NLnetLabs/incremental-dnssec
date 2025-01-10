@@ -107,7 +107,7 @@ However, DNSSEC has a similar problem.
 The introduction of the dnskeyref parameter make it possible to manage DNSSEC without involving the registrant.
 
 One extra feature that becomes possible with the use of SVCB-style records is to let the zone manage downgrade attacks.
-By introducing ds of dnskeyref parameters at different priority level, the zone can signal which algorithm is preferred.
+By introducing ds or dnskeyref parameters at different priority level, the zone can signal which algorithm is preferred.
 
 This document updates Section 2.1.1 of {{?RFC4034}} in the following way: the sentence "If bit 7 has value 0, then the DNSKEY record holds some other type of DNS public key and MUST NOT be used to verify RRSIGs that cover RRsets." is replaced by "If bit 7 has value 0, then the DNSKEY record holds some other type of DNS public key and can be used to verify RRSIGs that cover RRsets if required."
 
