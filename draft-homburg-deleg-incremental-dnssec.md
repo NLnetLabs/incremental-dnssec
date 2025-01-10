@@ -321,7 +321,7 @@ An attacker can only assume then if the attacker can obtain the private key that
 This is not impossible but very unlikely.
 And the use of hardware security modules (HSM) can make this almost impossible.
 
-In contrast if a dnskeyref refers to a name in a forgotten domain in the registration of the domain is left to elapse then an attacker may register the name and set up a DNSKEY RRset at the name listed in the dnskeyref parameter.
+In contrast if a dnskeyref refers to a name in a forgotten domain and the registration of the domain is expired then an attacker may register the name and set up a DNSKEY RRset at the name listed in the dnskeyref parameter.
 The risk of this can be reduced by two operational practices.
 The first is to put the dnskeyref parameter in the same (AliasMode) DELEG record that provides the name server delegation.
 This will make it likely that dnskeyref parameter will be removed once the
