@@ -315,7 +315,7 @@ This DNS lookup is protected by a traditional DNSSEC chain, but the presence of 
 
 This trade-off between struct security and flexibility is left to the zone operator.
 
-A new risk that needs to be consider is old and forgotten dnskeyref parameters.
+A new risk that needs to be considered is old and forgotten dnskeyref parameters.
 Old DS records or ds parameters are mostly safe.
 An attacker can only asume then if the attacker can obtain the private key that can sign for the public key that the DS record or ds parameter refers to.
 This is not impossible but very unlikely.
