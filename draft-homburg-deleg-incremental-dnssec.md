@@ -327,7 +327,7 @@ The first is to put the dnskeyref parameter in the same (AliasMode) DELEG record
 This will make it likely that dnskeyref parameter will be removed once the
 name servers no long serve the zone.
 
-The second practice is that domain that allow registrations (mostly top level domains (TLD) but also other) could install a policy that a dnskeyref parameter has to refer to a DNSSEC Secure DNSKEY RRset set.
+The second practice is that domains that allow registrations (mostly top level domains (TLD) but also others) could install a policy that a dnskeyref parameter MUST refer to a DNSSEC Secure DNSKEY RRsets.
 Additionally each DNSKEY RRset that is referred to by a dnskeyref parameter has to be used to sign the zone as served by at least on of the name servers that serve the zone.
 This makes it possible to detect forgotten or misconfigured dnskeyref paramters early on.
 
