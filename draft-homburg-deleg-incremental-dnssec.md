@@ -101,7 +101,7 @@ The charter for the Deleg working group has the following:
 {:quote}
 > The DNS protocol has limited ability for authoritative servers to signal their capabilities to recursive resolvers. In part, this stems from the lack of a mechanism for parents (often registries) to specify additional information about child delegations (often registrants) beyond NS, DS, and glue records. Further complicating matters is the similar lack of a mechanism for a registrant to signal that the operation of a delegation point is being outsourced to a different operator, leaving a challenge when operators need to update parental information that is only in the control of the child. Data is often out of synchronization between parents and children, which causes significant operational problems.
 
-Most focus until today has been on making it possible to update the name servers of a delegation without involving the registrant.
+The main focus to date has been on making it possible to update the name servers of a delegation without involving the registrant.
 However, DNSSEC has a similar problem.
 
 The introduction of the dnskeyref parameter make it possible to manage DNSSEC without involving the registrant.
