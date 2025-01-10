@@ -317,7 +317,7 @@ This trade-off between struct security and flexibility is left to the zone opera
 
 A new risk that needs to be considered is old and forgotten dnskeyref parameters.
 Old DS records or ds parameters are mostly safe.
-An attacker can only asume then if the attacker can obtain the private key that can sign for the public key that the DS record or ds parameter refers to.
+An attacker can only assume then if the attacker can obtain the private key that can sign for the public key that the DS record or ds parameter refers to.
 This is not impossible but very unlikely.
 And the use of hardware security modules (HSM) can make this almost impossible.
 
