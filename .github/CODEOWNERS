@@ -1,0 +1,3 @@
+# Automatically generated CODEOWNERS
+# Regenerate with `make update-codeowners`
+draft-homburg-deleg-incremental-dnssec.md philip@nlnetlabs.nl willem@nlnetlabs.nl
