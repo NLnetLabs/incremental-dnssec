@@ -18,7 +18,7 @@ subject to a Simplified BSD License) in Contributions.
 ## Working Group Information
 
 Discussion of this work occurs on the [DNS Delegation
-Working Group mailing list](mailto:dd@ietf.org)
+ mailing list](mailto:dd@ietf.org)
 ([archive](https://mailarchive.ietf.org/arch/browse/dd/),
 [subscribe](https://www.ietf.org/mailman/listinfo/dd)).
 In addition to contributions in GitHub, you are encouraged to participate in
@@ -28,4 +28,4 @@ discussions there.
 technical issues needs to occur on the mailing list.
 
 You might also like to familiarize yourself with other
-[Working Group documents](https://datatracker.ietf.org/wg/deleg/documents/).
+[ documents](https://datatracker.ietf.org/wg/deleg/documents/).
