@@ -1,0 +1,544 @@
+
+
+
+
+DNS Delegation                                                P. Homburg
+Internet-Draft                                                 W. Toorop
+Updates: 4034, 4035 (if approved)                             NLnet Labs
+Intended status: Standards Track                          6 January 2025
+Expires: 10 July 2025
+
+
+               Incrementally Deployable DNSSEC Delegation
+             draft-homburg-deleg-incremental-dnssec-latest
+
+Abstract
+
+   This document proposes a DNSSEC delegation mechanism that complements
+   [I-D.homburg-deleg-incremental-deleg].  In addition this mechanism
+   simplifies multi-signer setups by removing the need to coordinate for
+   signers during key rollovers.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-homburg-deleg-incremental-
+   dnssec/.
+
+   Discussion of this document takes place on the deleg Working Group
+   mailing list (mailto:dd@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/dd/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/dd/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/NLnetLabs/incremental-dnssec.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 10 July 2025.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+     1.1.  Incremental Deleg
+     1.2.  Terminology
+   2.  New parameters
+     2.1.  The ds parameter
+     2.2.  The dnskeyref parameter
+   3.  Validator behavior
+   4.  Signer behavior
+   5.  Examples
+     5.1.  One ds parameter that is part of a delegation
+     5.2.  One separate DELEG record with a ds parameter
+     5.3.  One separate DELEG record with a dnskeyref parameter
+     5.4.  Two operators with dnskeyref parameters
+   6.  Security Considerations
+   7.  IANA Considerations
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
+   Acknowledgments
+   Authors' Addresses
+
+1.  Introduction
+
+   This document describes a DNSSEC delegation mechanism that
+   complements [I-D.homburg-deleg-incremental-deleg].  In particular,
+   this mechanism makes it possible to store the contents of DS records
+   as 'ds' parameters in SVCB-style records.  This way, a single
+   mechanism can specify both name servers and DNSSEC delegations.
+
+   In addition to a replacement for DS records, this document also
+   introduces a 'dnskeyref' parameter that provides more flexibility and
+   reduces the need to coordinate both for key rollovers and for multi-
+   signer setups.
+
+   There are two main problems with the current DS record.  The first is
+   a DS record refers to a key in a DNSKEY RRset.  Updating this keys
+   (during a key rollover) requires updating the corresponding DS
+   record.  At the moment there is no widespread mechanism to update DS
+   records automatically.  However, even if such an update mechanism
+   would become widespread, the signer also has to track to propagation
+   of the new DS record to the secondaries of the parent zone.  This is
+   needed to make sure that all old DS records are expired in caches
+   before moving to the next stage of a key roll.
+
+   The second problem is that DS records enforce the use of a single
+   DNSKEY RRset (at the apex of the zone).  This means that in a multi-
+   signer setup, signers have to coordinate when rolling their signing
+   keys.
+
+   There is one minor problem that can be solved as well.  Currently
+   every signed zone has to have a DNSKEY RRset at the apex.  If a
+   collection of zones share the same keys then this can be burden to
+   maintain.
+
+   The solution to these problems is to introduce a dnskeyref parameter
+   that contains the names of DNSKEY RRsets that are allowed to sign a
+   zone.  This extra level of indirection avoids the need to involve the
+   parent during key rolls.  Multiple DNSKEY RRsets make it possible to
+   perform key rolls in a multi-signer setup without coordination.
+   Finally, this allows a single DNSKEY RRset to be used for multiple
+   domains.
+
+   The charter for the Deleg working group has the following:
+
+   |  The DNS protocol has limited ability for authoritative servers to
+   |  signal their capabilities to recursive resolvers.  In part, this
+   |  stems from the lack of a mechanism for parents (often registries)
+   |  to specify additional information about child delegations (often
+   |  registrants) beyond NS, DS, and glue records.  Further
+   |  complicating matters is the similar lack of a mechanism for a
+   |  registrant to signal that the operation of a delegation point is
+   |  being outsourced to a different operator, leaving a challenge when
+   |  operators need to update parental information that is only in the
+   |  control of the child.  Data is often out of synchronization
+   |  between parents and children, which causes significant operational
+   |  problems.
+
+   The main focus to date has been on making it possible to update the
+   name servers of a delegation without involving the registrant.
+   However, DNSSEC has a similar problem.
+
+   The introduction of the dnskeyref parameter make it possible to
+   manage DNSSEC without involving the registrant.
+
+   One extra feature that becomes possible with the use of SVCB-style
+   records is to let the zone manage downgrade attacks.  By introducing
+   ds or dnskeyref parameters at different priority level, the zone can
+   signal which algorithm is preferred.
+
+   This document updates Section 2.1.1 of [RFC4034] in the following
+   way: the sentence "If bit 7 has value 0, then the DNSKEY record holds
+   some other type of DNS public key and MUST NOT be used to verify
+   RRSIGs that cover RRsets." is replaced by "If bit 7 has value 0, then
+   the DNSKEY record holds some other type of DNS public key and can be
+   used to verify RRSIGs that cover RRsets if required."
+
+   This document updates Section 5.3.1 of [RFC4035] and replaces the
+   sentence "The RRSIG RR's Signer's Name field MUST be the name of the
+   zone that contains the RRset." with "The RRSIG RR's Signer's Name
+   field MUST be the name of any DNSKEY RRset that is allowed to sign
+   the zone."
+
+1.1.  Incremental Deleg
+
+   This section is to be removed before publishing as an RFC.
+
+   This document builds on [I-D.homburg-deleg-incremental-deleg] so
+   examples will show _deleg labels.  This document does however assume
+   a new SVCB-style type called DELEG to be able to make clear that some
+   semantics are different from SVCB records.
+
+   The mechanisms described in this document can work with
+   [I-D.wesplaap-deleg] as well.  However, this will create a deployment
+   issue.  If a validator that implements this document and
+   [I-D.wesplaap-deleg] forwards requests to a recursive resolver that
+   does not implement [I-D.wesplaap-deleg] then validation will fail if
+   the delegation uses DELEG records.
+
+   In contrast the same setup but then with
+   [I-D.homburg-deleg-incremental-deleg] will work.
+
+1.2.  Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document follows terminology as defined in [RFC9499].
+
+   Throughout this document we will also use terminology with the
+   meaning as defined below:
+
+   Incremental deleg:
+      The delegation mechanism as specified in
+      [I-D.homburg-deleg-incremental-deleg].
+
+   Incremental delegation:
+      A delegation as specified in
+      [I-D.homburg-deleg-incremental-deleg].
+
+   AliasMode:
+      An SVCB mode as specified in [RFC9460].
+
+   ServiceMode:
+      An SVCB mode as specified in [RFC9460].
+
+   SvcParamKey:
+      An SVCB field as specified in [RFC9460].
+
+   SvcParamValue:
+      An SVCB field as specified in [RFC9460].
+
+2.  New parameters
+
+   Two new SVCB-style parameters are introduced: ds and dnskeyref.
+
+   To limit validation resources and avoid accidentally delegating
+   security, these two parameters are not valid after following an SVCB-
+   style record in AliasMode.
+
+   For DELEG records, these parameters are allowed to be added to DELEG
+   records in AliasMode.  To increase flexibility, a DELEG record in
+   ServiceMode can be created with just ds or dnskeyref parameters but
+   without name server delegation.  In that case the TargetName has to
+   be set to ".".  Unlike SVCB records, for DELEG we allow mixing of
+   AliasMode and ServiceMode records.
+
+2.1.  The ds parameter
+
+   The ds parameter puts the equivalent of multiple DS records in one
+   parameter.
+
+   To simplify parsing, the presentation format is a space separated
+   list of strings where each string is in the form <key-
+   tag>:<algorithm>:<igest-type>:<digest>.  The parts key-tag,
+   algorithm, digest-type and digest have their meaning and encoding as
+   described for the presentation format of the DS record (See
+   [RFC4034], Section 5.3).
+
+   A parameters start with a 2-octet field that contains the SvcParamKey
+   following by a 2-octet field containing the length of the
+   SvcParamValue.
+
+   For the ds parameter, the SvcParamValue field consists of a sequence
+   of DS record RDATA octet sequences prefixed by a 1-octet length
+   field.  The length field contains the length of the DS record RDATA.
+
+   The encoding of the RDATA octet sequence is the same as for an
+   equivalent DS record (with the exact same owner name as the SVCB-
+   style record that contains the ds parameter).
+
+2.2.  The dnskeyref parameter
+
+   The dnskeyref parameter names one or more DNSKEY RRsets.  The
+   presentation format of the value is a space separated list of DNS
+   names.
+
+   The wire format starts with a 2-octet field that contains that
+   SvcParamKey followed by a 2-octet filed than contains the length of
+   SvcParamValue.
+
+   For dnskeyref, the SvcParamValue consists of just a concontenated
+   list of uncompressed DNS names in wire format.  DNS names are self
+   terminating so there is no need for extra length fields.
+
+3.  Validator behavior
+
+   When following a delegation, a validator MUST first look for an
+   Incremental delegation.  If presence or absence is not DNSSEC Secure
+   (i.e., the status is Insecure, Bogus or Indeterminate) then the child
+   is not secure and the algorithm stops here.
+
+   If absence of an Incremental delegation is proven to be Secure then
+   then validator MAY continue validating using DS records.
+
+   If a secure Incremental delegation is found then the validator MUST
+   ignore any DS records and solely rely on what is found in the
+   Incremental deleg records.
+
+   If the Incremental deleg records contain no ds or dnskeyref
+   parameters or these do not lead to any key with an algorithm that the
+   validator supports then the delegation is considered insecure.
+
+   A validator MUST NOT use any ds or dnskeyref parameters found after
+   following an SVCB-style record in AliasMode.  Restricting ds and
+   dnskeyref to the top level is essential in preventing a DNS operator
+   (who is supposed to only serve a zone, not sign it) from adding
+   additional ds or dnskeyref parameters.
+
+   To support protection against downgrade attacks, a validator SHOULD
+   consider only SVCB-style records with the highest priority that
+   either have a ds parameter that has a least one algrithm supported by
+   the validator or in the case of dnskeyref, a DNSKEY RRset that
+   contains at least one key with an algorithm that is supported.
+
+   After selecting priority level, the validator uses any ds parameters
+   to validate the DNSKEY RRset the apex of the child zone.  The DNSKEY
+   RRsets that dnskeyref paramters refer need to be DNSSEC Secure to be
+   used.  Any DNSKEY RRsets that are not DNSSEC Secure according to the
+   validator MUST be ignored.
+
+   [Note, to be removed for publication.  Should the validator check if
+   the Zone Key flag is zero if the DNSKEY RRset is not at the apex.
+   For now assume that it is just like the SEP flag and can be ignored.]
+
+   To limit validator resources, when validating a name that refers to a
+   DNSKEY RRset, the validator should only use ds parameters (and DS
+   records) and ignore any dnskeyref parameters.  Validator SHOULD allow
+   for a DNAME and CNAME chain of reasonable length when resolving a
+   name to a DNSKEY RRset.
+
+   Now that there are multiple DNSKEY RRsets that may be used to sign an
+   RRset, the validator uses the Signer's Name in a signature to select
+   a DNSKEY RRset to validate the signature.  If the name does not match
+   any of the DNSKEY RRset selected in the previous step then the
+   signature MUST be ignored.
+
+4.  Signer behavior
+
+   Signer MUST put ds and dnskeyref parameters only in DELEG records at
+   an Incremental delegation and not in SVCB-style records that follow a
+   DELEG record in AliasMode.
+
+   The ds parameter affects signers in one small way: the priority
+   system of SVCB-style records can be used to provide protection again
+   downgrades.  The signer can put a ds parameter with a more secure
+   algorithm in a DELEG record with a higher priority and expect
+   fallback to the less secure algorithm only if the validator does not
+   understand the more secure algorithm.
+
+   The dnskeyref parameter requires that the validator puts the name of
+   the DNSKEY RRset in the Signer's Name field of the signature.  This
+   is a small but significant change to how signers operate.  The DNSKEY
+   RRset MUST be DNSSEC Secure and the validation chain MUST only
+   involve ds parameters or DS records.  In addition DNSKEY records that
+   are not at the apex of a zone MUST have the Zone Key flag set to 0
+   (bit 7 of the flags field, see [RFC4034], Section 2.1.1) The
+   dnskeyref parameter also supports downgrade protection but has a
+   number of additinal features that can be used by signers.
+
+   The first is that because dnskeyref directly refers to a DNSKEY RRset
+   there is no longer any need for Key Signing Keys (KSK).  Those DNSKEY
+   RRsets only contain Zone Signing Keys (ZSK).  This means that KSK
+   rollovers are no longer necessary.  It is also no longer necessary to
+   coordinate with the parent zone for key rollovers.
+
+   The second is that dnskeyref can refer to a DNSKEY RRset that is used
+   to sign multiple zones.  Zones do no need to have their own copies of
+   key material.  Instead a single DNSKEY RRset can be used for as many
+   zones as needed.
+
+   Third, in a multi-signer setup, each signer can maintain its own
+   DNSKEY RRset independent of other signers.  This means that each
+   signer can perform key rollovers without any need to coordinate with
+   other signers.
+
+5.  Examples
+
+5.1.  One ds parameter that is part of a delegation
+
+   $ORIGIN example.
+   @                  IN  SOA   ns zonemaster ...
+   customer1._deleg   IN  DELEG 1 ( ns.customer1
+                   ipv4hint=198.51.100.1,203.0.113.1
+                   ipv6hint=2001:db8:1::1,2001:db8:2::1
+                   ds=60485:5:1:2BB183AF5F22588179A53B0A98631FAD1A292118
+                                  )
+
+          Figure 1: One ds parameter that is part of a delegation
+
+5.2.  One separate DELEG record with a ds parameter
+
+$ORIGIN example.
+@                  IN  SOA   ns zonemaster ...
+customer2._deleg   IN  DELEG 0 ns.operator1
+                   IN  DELEG 1 ( .
+                    ds="60485:5:1:2BB183AF5F22588179A53B0A98631FAD1A292118
+ 370:13:2:BE74359954660069D5C63D200C39F5603827D7DD02B56F120EE9F3A86764247C"
+                               )
+
+       Figure 2: One separate DELEG record with a ds parameter
+
+5.3.  One separate DELEG record with a dnskeyref parameter
+
+   $ORIGIN example.
+   @                  IN  SOA   ns zonemaster ...
+   customer3._deleg   IN  DELEG 0 ns.operator1
+                      IN  DELEG 1 ( .
+                       dnskeyref=customer3.keys.operator1
+                                  )
+
+       Figure 3: One separate DELEG record with a dnskeyref parameter
+
+5.4.  Two operators with dnskeyref parameters
+
+   $ORIGIN example.
+   @                  IN  SOA   ns zonemaster ...
+   customer4._deleg   IN  DELEG 1 ( ns.operator1
+                       dnskeyref=customer4.keys.operator1
+                                     )
+                      IN  DELEG 1 ( ns.operator2
+                       dnskeyref=customer-keys.operator3
+                                     )
+
+             Figure 4: Two operators with dnskeyref parameters
+
+6.  Security Considerations
+
+   The ds parameter is a slight improvement over the DS record because
+   it allows SVCB priorities to be used for downgrade protection.
+   Otherwise, the semantics are the same.  This relies on the
+   restriction that ds (and dnskeyref) parameters can only appear the
+   top level and not after following an SVCB-style record in AliasMode.
+
+   The dnskeyref parameter breaks the traditional chain semantics of
+   DNSSEC.  With the ds parameter (or the DS record) the validity of a
+   signature depends only on a chain of cryptographic primitives.  With
+   dnskeyref, a DNS lookup is inserted.  This DNS lookup is protected by
+   a traditional DNSSEC chain, but the presence of the name means that
+   it is no longer a cryptographic chain.
+
+   This trade-off between struct security and flexibility is left to the
+   zone operator.
+
+   A new risk that needs to be considered is old and forgotten dnskeyref
+   parameters.  Old DS records or ds parameters are mostly safe.  An
+   attacker can only assume then if the attacker can obtain the private
+   key that can sign for the public key that the DS record or ds
+   parameter refers to.  This is not impossible but very unlikely.  And
+   the use of hardware security modules (HSM) can make this almost
+   impossible.
+
+   In contrast if a dnskeyref refers to a name in a forgotten domain and
+   the registration of the domain is expired then an attacker may
+   register the name and set up a DNSKEY RRset at the name listed in the
+   dnskeyref parameter.  The risk of this can be reduced by two
+   operational practices.  The first is to put the dnskeyref parameter
+   in the same (AliasMode) DELEG record that provides the name server
+   delegation.  This will make it likely that dnskeyref parameter will
+   be removed once the name servers no long serve the zone.
+
+   The second practice is that domains that allow registrations (mostly
+   top level domains (TLD) but also others) could install a policy that
+   a dnskeyref parameter MUST refer to a DNSSEC Secure DNSKEY RRsets.
+   Additionally each DNSKEY RRset that is referred to by a dnskeyref
+   parameter has to be used to sign the zone as served by at least one
+   of the name servers that serves the zone.  This makes it possible to
+   detect forgotten or misconfigured dnskeyref paramters early on.
+
+7.  IANA Considerations
+
+   Per [RFC9460], IANA is requested to add the following entry to the
+   DNS "Service Parameter Keys (SvcParamKeys)" registry:
+
+    +========+===========+===============+===========+============+==+
+    | Number | Name      | Meaning       | Reference | Change     |  |
+    |        |           |               |           | Controller |  |
+    +========+===========+===============+===========+============+==+
+    | TBD    | ds        | DNSSEC        | [this     | IETF       |  |
+    |        |           | delegations   | document] |            |  |
+    +--------+-----------+---------------+-----------+------------+--+
+    | TBD    | dnskeyref | Names of      | [this     | IETF       |  |
+    |        |           | DNSKEY RRsets | document] |            |  |
+    +--------+-----------+---------------+-----------+------------+--+
+
+       Table 1: Entry in the Service Parameter Keys (SvcParamKeys)
+                                 registry
+
+8.  References
+
+8.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+8.2.  Informative References
+
+   [I-D.homburg-deleg-incremental-deleg]
+              Homburg, P., Wicinski, T., van Zutphen, J., and W. Toorop,
+              "Incrementally Deployable Extensible Delegation for DNS",
+              Work in Progress, Internet-Draft, draft-homburg-deleg-
+              incremental-deleg-01, 8 January 2025,
+              <https://datatracker.ietf.org/doc/html/draft-homburg-
+              deleg-incremental-deleg-01>.
+
+   [I-D.wesplaap-deleg]
+              April, T., Špaček, P., Weber, R., and Lawrence,
+              "Extensible Delegation for DNS", Work in Progress,
+              Internet-Draft, draft-wesplaap-deleg-01, 21 October 2024,
+              <https://datatracker.ietf.org/doc/html/draft-wesplaap-
+              deleg-01>.
+
+   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Resource Records for the DNS Security Extensions",
+              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+              <https://www.rfc-editor.org/rfc/rfc4034>.
+
+   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Protocol Modifications for the DNS Security
+              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
+              <https://www.rfc-editor.org/rfc/rfc4035>.
+
+   [RFC9460]  Schwartz, B., Bishop, M., and E. Nygren, "Service Binding
+              and Parameter Specification via the DNS (SVCB and HTTPS
+              Resource Records)", RFC 9460, DOI 10.17487/RFC9460,
+              November 2023, <https://www.rfc-editor.org/rfc/rfc9460>.
+
+   [RFC9499]  Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+              <https://www.rfc-editor.org/rfc/rfc9499>.
+
+Acknowledgments
+
+   Jens Finkhäuser, Havard Eidnes, Edward Lewis, Petr Špaček, Johan
+   Stenstam
+
+Authors' Addresses
+
+   Philip Homburg
+   NLnet Labs
+   Email: philip@nlnetlabs.nl
+
+
+   Willem Toorop
+   NLnet Labs
+   Email: willem@nlnetlabs.nl
