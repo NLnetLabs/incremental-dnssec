@@ -27,7 +27,7 @@ updates: 4034, 4035
 docname: draft-homburg-deleg-incremental-dnssec-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
-date: 2025-01-06
+date: 2025-01-16
 consensus: true
 v: 3
 area: int
