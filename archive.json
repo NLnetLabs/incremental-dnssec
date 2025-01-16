@@ -1,0 +1,290 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2025-01-16T00:17:31.822466+00:00",
+  "repo": "NLnetLabs/incremental-dnssec",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDONmi9aM6HNa37",
+      "title": "Initial version of the Incremental DNSSEC draft",
+      "url": "https://github.com/NLnetLabs/incremental-dnssec/pull/1",
+      "state": "MERGED",
+      "author": "Philip-NLnetLabs",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-01-09T13:43:06Z",
+      "updatedAt": "2025-01-13T09:24:55Z",
+      "baseRepository": "NLnetLabs/incremental-dnssec",
+      "baseRefName": "main",
+      "baseRefOid": "102a53266a8fccc87265fdfbe7a7aeaaa6c05e0f",
+      "headRepository": "NLnetLabs/incremental-dnssec",
+      "headRefName": "initial",
+      "headRefOid": "821d60bbec9504589dc4b81d05553fd139010b52",
+      "closedAt": "2025-01-13T09:24:49Z",
+      "mergedAt": "2025-01-13T09:24:49Z",
+      "mergedBy": "Philip-NLnetLabs",
+      "mergeCommit": {
+        "oid": "cbcaa6ee2fdd224884eb4b8b541559dbe545fd0f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDONmi9aM6Xjj1E",
+          "commit": {
+            "abbreviatedOid": "895e27f"
+          },
+          "author": "wtoorop",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "Excellent. Very readable! Just some type corrections and other suggestions in the \"nits\" category",
+          "createdAt": "2025-01-10T15:10:59Z",
+          "updatedAt": "2025-01-10T16:03:52Z",
+          "comments": [
+            {
+              "originalPosition": 77,
+              "body": "```suggestion\r\nIn addition to a replacement for DS records, this document also introduces a 'dnskeyref' parameter that provides more flexibility and reduces the need to coordinate both for key rollovers and for multi-signer setups.\r\n```",
+              "createdAt": "2025-01-10T15:10:59Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 84,
+              "body": "```suggestion\r\nHowever, even if such an update mechanism would become widespread, the signer also has to track to propagation of the new DS record to the secondaries of the parent zone.\r\n```",
+              "createdAt": "2025-01-10T15:12:35Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 105,
+              "body": "```suggestion\r\nThe main focus to date has been on making it possible to update the name servers of a delegation without involving the registrant.\r\n```",
+              "createdAt": "2025-01-10T15:17:28Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 110,
+              "body": "```suggestion\r\nOne extra feature that becomes possible with the use of SVCB-style records is to let the zone manage downgrade attacks.\r\n```",
+              "createdAt": "2025-01-10T15:19:55Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 111,
+              "body": "```suggestion\r\nBy introducing ds or dnskeyref parameters at different priority level, the zone can signal which algorithm is preferred.\r\n```",
+              "createdAt": "2025-01-10T15:20:38Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 113,
+              "body": "```suggestion\r\nThis document updates {{Section 2.1.1 of ?RFC4034}} in the following way: the sentence \"If bit 7 has value 0, then the DNSKEY record holds some other type of DNS public key and MUST NOT be used to verify RRSIGs that cover RRsets.\" is replaced by \"If bit 7 has value 0, then the DNSKEY record holds some other type of DNS public key and can be used to verify RRSIGs that cover RRsets if required.\"\r\n```",
+              "createdAt": "2025-01-10T15:22:44Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 115,
+              "body": "```suggestion\r\nThis document updates {{Section 5.3.1 of ?RFC4035}} and replaces the sentence \"The RRSIG RR's Signer's Name field MUST be the name of the zone that contains the RRset.\" with \"The RRSIG RR's Signer's Name field MUST be the name of any DNSKEY RRset that is allowed to sign the zone.\"\r\n```",
+              "createdAt": "2025-01-10T15:23:03Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 121,
+              "body": "```suggestion\r\nThis document builds on {{?I-D.homburg-deleg-incremental-deleg}} so examples will show _deleg labels.\r\n```",
+              "createdAt": "2025-01-10T15:24:36Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 164,
+              "body": "```suggestion\r\nFor DELEG records, these parameters are allowed to be added to DELEG records in AliasMode.\r\n```",
+              "createdAt": "2025-01-10T15:26:56Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 173,
+              "body": "```suggestion\r\nTo simplify parsing, the presentation format is a space separated list of strings where each string is in the form \\<key-tag>:\\<algorithm>:\\<digest-type>:\\<digest>.\r\n```",
+              "createdAt": "2025-01-10T15:28:15Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 175,
+              "body": "```suggestion\r\nThe parts key-tag, algorithm, digest-type and digest have their meaning and encoding as described for the presentation format of the DS record (See {{?RFC4034, Section 5.3}}).\r\n```",
+              "createdAt": "2025-01-10T15:30:16Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 178,
+              "body": "```suggestion\r\nA parameters start with a 2-octet field that contains the SvcParamKey following by a 2-octet field containing the length of the SvcParamValue.\r\n```",
+              "createdAt": "2025-01-10T15:31:03Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 181,
+              "body": "```suggestion\r\nFor the ds parameter, the SvcParamValue field consists of a sequence of DS record RDATA octet sequences prefixed by a 1-octet length field.\r\n```",
+              "createdAt": "2025-01-10T15:31:30Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 186,
+              "body": "```suggestion\r\nThe encoding of the RDATA octet sequence is the same as for an equivalent DS record (with the exact same owner name as the SVCB-style record that contains the ds parameter).\r\n```",
+              "createdAt": "2025-01-10T15:32:44Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 193,
+              "body": "```suggestion\r\nThe wire format starts with a 2-octet field that contains that SvcParamKey followed by a 2-octet field than contains the length of SvcParamValue.\r\n```",
+              "createdAt": "2025-01-10T15:33:21Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 195,
+              "body": "```suggestion\r\nFor dnskeyref, the SvcParamValue consists of just a concatenated list of uncompressed DNS names in wire format.\r\n```",
+              "createdAt": "2025-01-10T15:33:53Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 203,
+              "body": "MAY? Moet dat niet MUST zijn?",
+              "createdAt": "2025-01-10T15:35:39Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 207,
+              "body": "```suggestion\r\nIf the Incremental deleg records contain no ds or dnskeyref parameters or these do not lead to any key with an algorithm that the validator supports, then the delegation is considered insecure.\r\n```",
+              "createdAt": "2025-01-10T15:38:00Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 212,
+              "body": "```suggestion\r\nTo support protection against downgrade attacks, a validator SHOULD consider only SVCB-style records with the highest priority that either have a ds parameter that has a least one algorithm supported by the validator or in the case of dnskeyref, a DNSKEY RRset that contains at least one key with an algorithm that is supported.\r\n```",
+              "createdAt": "2025-01-10T15:39:26Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 214,
+              "body": "```suggestion\r\nAfter selecting priority level, the validator uses any ds parameters to validate the DNSKEY RRset at the apex of the child zone.\r\n```",
+              "createdAt": "2025-01-10T15:39:57Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 215,
+              "body": "```suggestion\r\nThe DNSKEY RRsets to which the dnskeyref parameters refer need to be DNSSEC Secure to be used.\r\n```",
+              "createdAt": "2025-01-10T15:40:45Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 222,
+              "body": "```suggestion\r\nValidator SHOULD allow for a DNAME and CNAME chain of reasonable length when resolving a name to a DNSKEY RRset.\r\n```",
+              "createdAt": "2025-01-10T15:43:38Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 228,
+              "body": "```suggestion\r\nSigners MUST put ds and dnskeyref parameters only in DELEG records at an Incremental delegation and not in SVCB-style records that follow a DELEG record in AliasMode.\r\n```",
+              "createdAt": "2025-01-10T15:44:23Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 236,
+              "body": "```suggestion\r\nIn addition DNSKEY records, that are not at the apex of a zone, MUST have the Zone Key flag set to 0 (bit 7 of the flags field, see {{?RFC4034, Section 2.1.1}})\r\n```",
+              "createdAt": "2025-01-10T15:47:58Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 237,
+              "body": "```suggestion\r\nThe dnskeyref parameter also supports downgrade protection, but has also a number of additional features that can be used by signers.\r\n```",
+              "createdAt": "2025-01-10T15:48:39Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 308,
+              "body": "```suggestion\r\nThe ds parameter is a slight improvement over the DS record because it allows SVCB priorities to be used for downgrade protection.\r\n```",
+              "createdAt": "2025-01-10T15:51:37Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 317,
+              "body": "```suggestion\r\nThis trade-off between strict security and flexibility is left to the zone operator.\r\n```",
+              "createdAt": "2025-01-10T15:54:46Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 319,
+              "body": "```suggestion\r\nA new risk that needs to be considered is old and forgotten dnskeyref parameters.\r\n```",
+              "createdAt": "2025-01-10T15:55:04Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 321,
+              "body": "```suggestion\r\nAn attacker can only assume then if the attacker can obtain the private key that can sign for the public key that the DS record or ds parameter refers to.\r\n```\r\nI have difficulty understanding what you're saying here",
+              "createdAt": "2025-01-10T15:57:49Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 325,
+              "body": "```suggestion\r\nIn contrast if a dnskeyref refers to a name in a forgotten domain and the registration of the domain is expired then an attacker may register the name and set up a DNSKEY RRset at the name listed in the dnskeyref parameter.\r\n```",
+              "createdAt": "2025-01-10T15:59:43Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 331,
+              "body": "```suggestion\r\nThe second practice is that domains that allow registrations (mostly top level domains (TLD) but also others) could install a policy that a dnskeyref parameter MUST refer to a DNSSEC Secure DNSKEY RRsets.\r\n```",
+              "createdAt": "2025-01-10T16:00:57Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            },
+            {
+              "originalPosition": 332,
+              "body": "```suggestion\r\nAdditionally each DNSKEY RRset that is referred to by a dnskeyref parameter has to be used to sign the zone as served by at least one of the name servers that serves the zone.\r\n```",
+              "createdAt": "2025-01-10T16:02:09Z",
+              "updatedAt": "2025-01-10T16:03:52Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
