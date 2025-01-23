@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-21T00:17:09.439850+00:00",
+  "timestamp": "2025-01-23T00:17:20.091229+00:00",
   "repo": "NLnetLabs/incremental-dnssec",
   "labels": [
     {
@@ -49,7 +49,32 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 2,
+      "id": "I_kwDONmi9aM6nKo2P",
+      "title": "DS records enforce the use of a single DNSKEY RRset",
+      "url": "https://github.com/NLnetLabs/incremental-dnssec/issues/2",
+      "state": "OPEN",
+      "author": "Philip-NLnetLabs",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [],
+      "body": "Issue by Ben Schwartz:\n\n  > DS records enforce the use of a single DNSKEY RRset (at the apex of\n   the zone).\n\n   I don't think this is true.  I would agree that it requires all DNSKEY\n   RRsets to cover the same set of algorithms.\n",
+      "createdAt": "2025-01-22T14:45:40Z",
+      "updatedAt": "2025-01-22T14:46:16Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "Philip-NLnetLabs",
+          "authorAssociation": "MEMBER",
+          "body": "Sent in reponse to mailing list:\nThat language can be more precise. DS records enforce that the DNSKEY RRset is\nlocated at the apex of the zone. There is no way around that.\n\nIt is true that different authoritative servers may serve different versions\nof the DNSKEY RRset provided that all keys that are used to signed the zone\n(ZSK) are in all copies of the DNSKEY RRset. So in practice this does not\navoid the need to coordinate in a multi-signer setup.\n",
+          "createdAt": "2025-01-22T14:46:15Z",
+          "updatedAt": "2025-01-22T14:46:15Z"
+        }
+      ]
+    }
+  ],
   "pulls": [
     {
       "number": 1,
